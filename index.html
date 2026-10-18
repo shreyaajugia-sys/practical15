@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Performance Prediction</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f4ff;
+    color: #222;
+}
+
+header {
+    background: #4338ca;
+    color: white;
+    text-align: center;
+    padding: 25px 15px;
+}
+
+header h1 {
+    margin: 0 0 10px;
+}
+
+header p {
+    margin: 0;
+}
+
+.container {
+    max-width: 650px;
+    margin: 30px auto;
+    padding: 25px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px #00000012;
+}
+
+h2 {
+    color: #4338ca;
+}
+
+label {
+    display: block;
+    margin-top: 18px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 22px;
+    background: #4338ca;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #312e81;
+}
+
+#result {
+    display: none;
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #eef2ff;
+    text-align: center;
+}
+
+#result h2 {
+    margin-top: 0;
+}
+
+#score {
+    font-size: 38px;
+    font-weight: bold;
+    color: #4338ca;
+}
+
+#message {
+    line-height: 1.6;
+}
+
+.error {
+    color: #c62828;
+    margin-top: 15px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎓 Student Performance Prediction</h1>
+    <p>Understand your study habits and estimated performance</p>
+</header>
+
+<div class="container">
+
+    <h2>Enter Student Details</h2>
+    <p>Fill in the details below to get your estimated result.</p>
+
+    <form id="predictionForm">
+
+        <label for="student">Student Name</label>
+        <input
+            type="text"
+            id="student"
+            placeholder="Enter your name"
+            required
+        >
+
+        <label for="hours">Study Hours Per Day</label>
+        <input
+            type="number"
+            id="hours"
+            min="0"
+            max="24"
+            step="0.5"
+            placeholder="Example: 5"
+            required
+        >
+
+        <label for="attendance">Attendance Percentage</label>
+        <input
+            type="number"
+            id="attendance"
+            min="0"
+            max="100"
+            placeholder="Example: 85"
+            required
+        >
+
+        <label for="previous">Previous Exam Marks (out of 100)</label>
+        <input
+            type="number"
+            id="previous"
+            min="0"
+            max="100"
+            placeholder="Example: 75"
+            required
+        >
+
+        <button type="submit">🔮 Predict Performance</button>
+
+        <button type="button" id="resetBtn"
+            style="background:#64748b; margin-top:10px;">
+            Clear Form
+        </button>
+
+        <p id="error" class="error" role="alert"></p>
+    </form>
+
+    <div id="result" aria-live="polite">
+        <h2>📊 Prediction Result</h2>
+
+        <p id="greeting"></p>
+
+        <p>Estimated Performance Score</p>
+        <div id="score">0/100</div>
+
+        <h3 id="level"></h3>
+        <p id="message"></p>
+    </div>
+
+</div>
+
+<footer>
+    Student Performance Prediction | Mini Project
+</footer>
+
+<script>
+const form = document.getElementById("predictionForm");
+const result = document.getElementById("result");
+const error = document.getElementById("error");
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("student").value.trim();
+    const hours = Number(document.getElementById("hours").value);
+    const attendance = Number(document.getElementById("attendance").value);
+    const previous = Number(document.getElementById("previous").value);
+
+    error.textContent = "";
+    result.style.display = "none";
+
+    if (!name) {
+        error.textContent = "Please enter the student's name.";
+        return;
+    }
+
+    if (
+        hours < 0 || hours > 24 ||
+        attendance < 0 || attendance > 100 ||
+        previous < 0 || previous > 100
+    ) {
+        error.textContent = "Please enter valid values in all fields.";
+        return;
+    }
+
+    // Simple demonstration scoring formula
+    const studyScore = (hours / 10) * 100;
+    const finalScore = Math.round(
+        studyScore * 0.30 +
+        attendance * 0.30 +
+        previous * 0.40
+    );
+
+    let level;
+    let message;
+
+    if (finalScore >= 80) {
+        level = "🌟 Excellent Performance";
+        message = "Keep up your study habits and continue practising!";
+    } else if (finalScore >= 60) {
+        level = "👍 Good Performance";
+        message = "You are making progress. Regular revision can help you improve.";
+    } else if (finalScore >= 40) {
+        level = "📚 Average Performance";
+        message = "Try a consistent study routine and review difficult topics.";
+    } else {
+        level = "💪 Needs Improvement";
+        message = "Start with small study goals and ask for help when needed.";
+    }
+
+    document.getElementById("greeting").textContent =
+        "Hello, " + name + "! Here is your estimated result.";
+
+    document.getElementById("score").textContent =
+        finalScore + "/100";
+
+    document.getElementById("level").textContent = level;
+    document.getElementById("message").textContent = message;
+
+    result.style.display = "block";
+    result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+
+document.getElementById("resetBtn").addEventListener("click", function() {
+    form.reset();
+    result.style.display = "none";
+    error.textContent = "";
+});
+</script>
+
+</body>
+</html>
